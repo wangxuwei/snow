@@ -18,13 +18,14 @@ import com.britesnow.snow.web.exception.WebExceptionContext;
 import com.britesnow.snow.web.handler.MethodInvoker;
 import com.britesnow.snow.web.handler.WebActionHandlerRef;
 import com.britesnow.snow.web.handler.WebHandlerContext;
+import com.britesnow.snow.web.handler.WebModelHandlerRef;
 import com.britesnow.snow.web.handler.WebObjectRegistry;
 import com.britesnow.snow.web.handler.WebResourceHandlerRef;
-import com.britesnow.snow.web.handler.WebModelHandlerRef;
 import com.britesnow.snow.web.hook.AppPhase;
 import com.britesnow.snow.web.hook.HookInvoker;
 import com.britesnow.snow.web.hook.On;
 import com.britesnow.snow.web.renderer.JsonRenderer;
+import com.britesnow.snow.web.renderer.JspRenderer;
 import com.britesnow.snow.web.renderer.freemarker.FreemarkerTemplateRenderer;
 import com.britesnow.snow.web.rest.RestRegistry;
 import com.britesnow.snow.web.rest.SerializerRegistry;
@@ -59,6 +60,8 @@ public class Application {
     // TODO: need to use just the JsonRenderer when it will be an interface.
     @Inject
     private JsonRenderer                   jsonRenderer;
+    @Inject
+    private JspRenderer                   jspRenderer;
 
     @Inject
     private WebObjectRegistry              webObjectRegistry;
@@ -146,6 +149,16 @@ public class Application {
     
     public boolean hasTemplate(RequestContext rc) {
         return freemarkerRenderer.hasTemplate(rc.getResourcePath(), rc);
+    }
+    
+    public boolean hasJspPage(RequestContext rc) {
+        return jspRenderer.hasTemplate(rc.getResourcePath(), rc);
+    }
+    
+    public void processJspPage(RequestContext rc) {
+        processWebModels(rc);
+        
+        jspRenderer.foward(rc);
     }
 
     public void processTemplate(RequestContext rc) throws Throwable {

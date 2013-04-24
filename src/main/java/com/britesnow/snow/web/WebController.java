@@ -366,27 +366,34 @@ public class WebController {
         
         try {
             if (!application.hasTemplate(rc) && !application.hasAllowSubPathsWebModel(rc)){
-                throw new AbortWithHttpStatusException(HttpStatus.NOT_FOUND);
+                if(application.hasJspPage(rc)){
+                    application.processJspPage(rc);
+                }else{
+                    throw new AbortWithHttpStatusException(HttpStatus.NOT_FOUND);
+                }
+            }else{
+                // TODO: probably need to remove this, not sure it does anything here (or it even should be here.
+                req.setCharacterEncoding(CHAR_ENCODING);
+
+                // TODO: needs to implement this
+                /*
+                 * if (!ignoreTemplateNotFound && !webApplication.getPart(part.getPri()).getResourceFile().exists()) {
+                 * sendHttpError(rc, HttpServletResponse.SC_NOT_FOUND, null); return; }
+                 */
+
+                res.setContentType("text/html;charset=" + CHAR_ENCODING);
+                // if not cachable, then, set the appropriate headers.
+                res.setHeader("Pragma", "No-cache");
+                res.setHeader("Cache-Control", "no-cache,no-store,max-age=0");
+                res.setDateHeader("Expires", 1);
+
+                application.processTemplate(rc);
+
+                rc.getWriter().close();
             }
             
-            // TODO: probably need to remove this, not sure it does anything here (or it even should be here.
-            req.setCharacterEncoding(CHAR_ENCODING);
-
-            // TODO: needs to implement this
-            /*
-             * if (!ignoreTemplateNotFound && !webApplication.getPart(part.getPri()).getResourceFile().exists()) {
-             * sendHttpError(rc, HttpServletResponse.SC_NOT_FOUND, null); return; }
-             */
-
-            res.setContentType("text/html;charset=" + CHAR_ENCODING);
-            // if not cachable, then, set the appropriate headers.
-            res.setHeader("Pragma", "No-cache");
-            res.setHeader("Cache-Control", "no-cache,no-store,max-age=0");
-            res.setDateHeader("Expires", 1);
-
-            application.processTemplate(rc);
-
-            rc.getWriter().close();
+            
+            
         } catch (Throwable t) {
             throw Throwables.propagate(t);
         }

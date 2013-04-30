@@ -2,6 +2,7 @@ package com.britesnow.snow.web.renderer;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 
 import javax.inject.Singleton;
 import javax.servlet.ServletException;
@@ -24,7 +25,10 @@ public class JspRenderer {
 
     public void foward(RequestContext rc) {
         try {
-            rc.getReq().setAttribute("m", rc.getWebModel());
+            for(Iterator ite = rc.getWebModel().keySet().iterator(); ite.hasNext(); ){
+                String key = (String) ite.next();
+                rc.getReq().setAttribute(key, rc.getWebModel().get(key));
+            }
             rc.getReq().getRequestDispatcher(rc.getResourcePath()+".jsp").forward(rc.getReq(), rc.getRes());
         } catch (ServletException e) {
             e.printStackTrace();

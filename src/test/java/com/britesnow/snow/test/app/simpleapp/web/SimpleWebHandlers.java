@@ -24,6 +24,11 @@ public class SimpleWebHandlers {
         contactIdSeq++;
     }
 
+    @WebModelHandler(startsWith = "/jspTest")
+    public void jspTest(@WebModel Map m) {
+        m.put("name", "hello world!");
+    }
+    
     @WebModelHandler(startsWith = "/contact")
     public void contactPage(@WebModel Map m, @WebParam("id") Long contactId) {
         Map contact = contactStore.get(contactId);
